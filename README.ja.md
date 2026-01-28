@@ -38,7 +38,7 @@
 
 ## はじめに
 
-このリポジトリは、HunyuanVideo、Wan2.1/2.2、FramePack、FLUX.1 Kontext、Qwen-ImageのLoRA学習用のコマンドラインツールです。このリポジトリは非公式であり、公式のHunyuanVideo、Wan2.1/2.2、FramePack、FLUX.1 Kontext、Qwen-Imageのリポジトリとは関係ありません。
+このリポジトリは、HunyuanVideo、Wan2.1/2.2、FramePack、FLUX.1 Kontext、FLUX.2 dev/klein、Qwen-Image、Z-ImageのLoRA学習用のコマンドラインツールです。このリポジトリは非公式であり、それらの公式リポジトリとは関係ありません。
 
 *リポジトリは開発中です。*
 
@@ -58,6 +58,29 @@
 
 GitHub Discussionsを有効にしました。コミュニティのQ&A、知識共有、技術情報の交換などにご利用ください。バグ報告や機能リクエストにはIssuesを、質問や経験の共有にはDiscussionsをご利用ください。[Discussionはこちら](https://github.com/kohya-ss/musubi-tuner/discussions)
 
+- 2026/01/24
+    - FLUX.2 [klein]のLoRA学習が動かなかったのを修正しました。またFLUX.2に関する各種の不具合修正、機能追加を行いました。[PR #858](https://github.com/kohya-ss/musubi-tuner/pull/858)
+        - `--model_version`の指定は`flux.2-dev`や`flux.2-klein-4b`等から、`dev`や`klein-4b`等に変更されました。
+        - fp8最適化なども動作します。詳細は[ドキュメント](./docs/flux_2.md)を参照してください。
+        - klein 9B、devモデル、および複数枚の制御画像を用いた学習は十分にテストされていないため、不具合があればIssueで報告してください。
+
+- 2026/01/21
+    - FLUX.2 [dev]/[klein]のLoRA学習に対応しました。[PR #841](https://github.com/kohya-ss/musubi-tuner/pull/841) https://www.scenario.com のchristopher5106氏に深く感謝します。
+        - 詳細は[ドキュメント](./docs/flux_2.md)を参照してください。
+
+- 2026/01/17
+    - Z-ImageのComfyUI向けのLoRA変換について、互換性向上のため `convert_lora.py` を使用するように変更しました。[PR #851](https://github.com/kohya-ss/musubi-tuner/pull/851)
+        - 以前の `convert_z_image_lora_to_comfy.py` も引き続き使用可能ですが、nunchakuで正しく動作しない可能性があります。
+        - 詳細は[ドキュメント](./docs/zimage.md#converting-lora-weights-to-diffusers-format-for-comfyui--lora重みをcomfyuiで使用可能なdiffusers形式に変換する)を参照してください。
+        - [Issue #847](https://github.com/kohya-ss/musubi-tuner/issues/847) で解決策を提供してくださったfai-9氏に感謝します。
+    - Qwen-Image-LayeredのLoRA学習で、元画像を学習対象から除外するオプション `--remove_first_image_from_target` を追加しました。[PR #852](https://github.com/kohya-ss/musubi-tuner/pull/852)
+        - 詳細は[ドキュメント](./docs/qwen_image.md#lora-training--lora学習)を参照してください。
+
+- 2026/01/11
+    - Qwen-Image-LayeredのLoRA学習に対応しました。[PR #816](https://github.com/kohya-ss/musubi-tuner/pull/816)
+        - 詳細は[ドキュメント](./docs/qwen_image.md)を参照してください。
+        - キャッシュ作成、学習、推論の各スクリプトで、`--model_version` オプションに `layered` を指定してください。
+
 - 2025/12/27
     - Qwen-Image-Edit-2511に対応しました。[PR #808](https://github.com/kohya-ss/musubi-tuner/pull/808)
         - チェックポイントやオプションの詳細など、詳細は[ドキュメント](./docs/qwen_image.md)を参照してください。
@@ -67,26 +90,6 @@ GitHub Discussionsを有効にしました。コミュニティのQ&A、知識�
     - Kandinsky 5のLoRA学習に対応しました。[PR #774](https://github.com/kohya-ss/musubi-tuner/pull/774) AkaneTendo25氏に深く感謝します。
         - 詳細は[ドキュメント](./docs/kandinsky5.md)を参照してください。
         - **重みの指定が一部、Hugging FaceのID形式になっています。近日中に（他のモデルと同様の）*.safetensorsの直接指定方式に変更予定ですのでご注意ください。**
-
-- 2025/12/13
-    - Z-Imageのfinetuningに対応しました。[PR #778](https://github.com/kohya-ss/musubi-tuner/pull/778) sdbds氏に深く感謝します。
-        - 詳細は[ドキュメント](./docs/zimage.md#finetuning)を参照してください。
-    - ごくシンプルなGUIツールを追加しました。[PR #779](https://github.com/kohya-ss/musubi-tuner/pull/779)
-        - 現在はZ-Image-TurboとQwen-ImageのLoRA学習に対応しています。詳細は[ドキュメント](./src/musubi_tuner/gui/gui.ja.md)を参照してください。
-
-- 2025/12/09
-    - Diffusers形式のLoRA重みを学習スクリプトの `--base_weights` オプションで読み込めるようになりました。[PR #772](https://github.com/kohya-ss/musubi-tuner/pull/772) これによりZ-Image-TurboのTraining Adapter等を使用して学習できます。
-    - De-TurboモデルおよびTraining Adapterを使用してZ-Image-TurboのLoRA学習を行う方法について、[ドキュメント](./docs/zimage.md)を更新しました。
-    - これらを提供してくださった ostris 氏に深く感謝します。
-
-- 2025/12/07
-    - Z-Image Turboに対応しました。[PR #757](https://github.com/kohya-ss/musubi-tuner/pull/757)
-        - Turboモデル（蒸留モデル）のため学習が不安定かもしれません。フィードバックを歓迎します。
-        - 詳細は[ドキュメント](./docs/zimage.md)を参照してください。
-
-- 2025/12/05
-    - HunyuanVideo 1.5に対応しました。[PR #748](https://github.com/kohya-ss/musubi-tuner/pull/748)
-        - T2V、I2VのLoRA学習が可能です。詳細は[ドキュメント](./docs/hunyuan_video_1_5.md)を参照してください。
 
 ### リリースについて
 
@@ -147,6 +150,10 @@ Musubi Tunerの解説記事執筆や、関連ツールの開発に取り組ん�
 - [FramePack (1フレーム推論)](./docs/framepack_1f.md)
 - [FLUX.1 Kontext](./docs/flux_kontext.md)
 - [Qwen-Image](./docs/qwen_image.md)
+- [Z-Image](./docs/zimage.md)
+- [HunyuanVideo 1.5](./docs/hunyuan_video_1_5.md)
+- [Kandinsky 5](./docs/kandinsky5.md)
+- [FLUX.2](./docs/flux_2.md)
 
 **共通設定・その他:**
 - [データセット設定](./docs/dataset_config.md)
